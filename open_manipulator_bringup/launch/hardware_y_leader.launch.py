@@ -57,14 +57,6 @@ def generate_launch_description():
         'hardware_controller_manager.yaml',
     ])
 
-    # ros2_control Node
-    control_node = Node(
-        package='controller_manager',
-        executable='ros2_control_node',
-        parameters=[robot_controllers],
-        output='both',
-    )
-
     # Robot description from Xacro
     robot_description_content = Command([
         PathJoinSubstitution([FindExecutable(name='xacro')]),
@@ -86,10 +78,7 @@ def generate_launch_description():
         package='controller_manager',
         executable='spawner',
         arguments=[
-            'gravity_compensation_controller',
-            'spring_actuator_controller',
             'joint_state_broadcaster',
-            'joint_trajectory_command_broadcaster',
         ],
         parameters=[robot_description],
     )
@@ -100,6 +89,14 @@ def generate_launch_description():
         executable='robot_state_publisher',
         output='both',
         parameters=[robot_description],
+    )
+
+    # ros2_control Node
+    control_node = Node(
+        package='controller_manager',
+        executable='ros2_control_node',
+        parameters=[robot_controllers, robot_description],
+        output='both',
     )
 
     # Wrap everything in a namespace 'leader'
